@@ -1,0 +1,149 @@
+/*
+ * General Styles - Matches the background of your home page
+ */
+.profile-container {
+  min-height: 100vh;
+  /* Use a similar vibrant blue gradient */
+  background: linear-gradient(135deg, #007bff, #00c6ff); 
+  padding: 50px 20px;
+  font-family: Arial, sans-serif; /* Use a common, clean font */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * Header Styling
+ */
+.profile-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.profile-header h1 {
+  font-size: 2.5em;
+  margin-bottom: 5px;
+}
+
+.profile-header p {
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+/*
+ * Main Profile Card Styling - Mimics the white card on your home page
+ */
+.profile-card, .settings-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft, noticeable shadow */
+  width: 100%;
+  max-width: 600px;
+  padding: 30px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/*
+ * Avatar Styling
+ */
+.profile-avatar {
+  font-size: 60px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 20px auto;
+  border: 4px solid #007bff; /* A subtle border in the theme's primary color */
+}
+
+/*
+ * User Details
+ */
+.user-details h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.user-details p {
+  color: #666;
+  line-height: 1.5;
+}
+
+/*
+ * Stats Grid (for Tracked Items, Alerts, etc.)
+ */
+.stats-grid {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.stat-box {
+  flex: 1;
+  padding: 10px;
+}
+
+.stat-box h3 {
+  font-size: 1.8em;
+  color: #007bff; /* Highlight with the primary theme color */
+  margin-bottom: 5px;
+}
+
+.stat-box p {
+  font-size: 0.9em;
+  color: #666;
+}
+
+/*
+ * Settings Card Styling
+ */
+.settings-card h2 {
+    text-align: left;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.settings-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.settings-card li {
+    margin-bottom: 10px;
+}
+
+.settings-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    text-align: left;
+}
+
+.settings-button:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-1px);
+}
+
+.settings-button.logout {
+    background-color: #dc3545; /* A standard 'danger' color for log out */
+    color: white;
+    margin-top: 20px;
+}
+
+.settings-button.logout:hover {
+    background-color: #c82333;
+}
