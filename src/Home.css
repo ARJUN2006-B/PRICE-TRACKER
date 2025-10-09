@@ -1,0 +1,199 @@
+/* 🌟 Main Container */
+.home-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  overflow-x: hidden;
+  padding: 0 20px; /* prevent content from touching screen edges */
+}
+
+/* 🌟 Title Section */
+.title-section {
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.title-section h1 {
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+
+/* 🏬 Store Logos */
+.stores {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 25px 0;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 900px;
+}
+
+.stores img {
+  height: 55px;
+  object-fit: contain;
+  transition: transform 0.2s;
+}
+
+.stores img:hover {
+  transform: scale(1.1);
+}
+
+/* 💳 Input Card */
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  margin: 30px 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 800px;
+}
+
+.input-section {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.input-section input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.check-btn {
+  background: #6a11cb;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.check-btn:hover {
+  background: #580da0;
+}
+
+.qr-btn {
+  margin-top: 12px;
+  background: transparent;
+  border: 2px solid #6a11cb;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #6a11cb;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.qr-btn:hover {
+  background: #6a11cb;
+  color: white;
+}
+
+/* 📊 Info Cards Grid */
+.info-grid {
+  display: flex;
+  gap: 25px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.info-card {
+  background: white;
+  color: black;
+  padding: 22px;
+  border-radius: 12px;
+  width: 260px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+/* ✅ Navbar Styling */
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(90deg, #007bff, #00c6ff);
+  padding: 12px 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ✅ Footer Styling */
+.footer {
+  margin-top: 50px;
+  text-align: center;
+  color: white;
+  font-size: 0.9rem;
+  padding: 20px 0;
+  opacity: 0.9;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 📱 Responsive Fixes */
+@media (max-width: 768px) {
+  .title-section h1 {
+    font-size: 2rem;
+  }
+
+  .stores img {
+    height: 45px;
+  }
+
+  .info-card {
+    width: 90%;
+  }
+
+  .nav-links {
+    gap: 20px;
+  }
+}
