@@ -16,7 +16,7 @@ body {
 }
 
 /* White container */
-.login-container {
+.Signup-container {
   background-color:white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   padding: 2rem 3rem;
@@ -27,7 +27,7 @@ body {
 }
 
 /* Heading */
-.login-container h2 {
+.Signup-container h2 {
   color: #6a0dad;
   margin-bottom: 1.5rem;
 }
