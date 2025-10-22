@@ -10,7 +10,7 @@ function validateUrl() {
   try {
     url = new URL(urlInput);
   } catch (e) {
-    alert("Please enter a valid URL (example: https://www.amazon.in/...)");
+    alert("Invalid URL format.");
     return;
   }
 
@@ -18,9 +18,10 @@ function validateUrl() {
   const isValidSite = allowedSites.some(site => url.hostname.includes(site));
 
   if (!isValidSite) {
-    alert("Please enter a valid e-commerce URL (Amazon, Flipkart, Meesho, Ajio, Myntra, etc.)");
+    alert("Unsupported e-commerce site.");
     return;
   }
 
-  alert("Valid URL! Proceeding with search...");
+  // ✅ Redirect to pricehistory.html with the product URL as a query parameter
+  window.location.href = `pricehistory.html?productUrl=${encodeURIComponent(urlInput)}`;
 }
