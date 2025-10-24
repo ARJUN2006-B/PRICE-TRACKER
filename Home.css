@@ -102,7 +102,7 @@ header .tagline {
   width: 350px;
   padding: 0.8rem 1rem;
   border: 2px solid #6a0dad;
-  border-radius: 8px 0 0 8px;
+  border-radius: 10px;
   outline: none;
   font-size: 1rem;
 }
@@ -114,8 +114,11 @@ header .tagline {
 .search-section button {
   background-color: #6a0dad;
   border: none;
+  height: 45px;
+  width: 100px;
+  margin-left: 20px;
   padding: 0.8rem 1rem;
-  border-radius: 0 8px 8px 0;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
