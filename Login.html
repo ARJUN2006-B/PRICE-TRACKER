@@ -6,27 +6,35 @@
   <title>Login Page</title>
   <link rel="stylesheet" href="Login.css" />
 </head>
+
 <body>
   <div class="login-container">
     <h2>Login</h2>
-    <form>
+    <form onsubmit="return false">
       <div class="input-group">
         <label for="email">Email</label>
         <input type="email" id="email" placeholder="Enter your email" required />
       </div>
+
       <div class="input-group">
         <label for="password">Password</label>
         <input type="password" id="password" placeholder="Enter your password" required />
       </div>
-      <a href="" style="margin-right: 190px;">forgot password</a>
-      <button type="submit" style="margin-top: 10px;">Login</button>
-      
-      <p style="margin-top: 5px;">or continue with</p>
 
-      <button type="button" margin-top: 5px;" > <img src="images/Google_logo.png" alt="Google" width="15px" heigth="15px" style="margin-right: 5px; margin-top:5px;"/> Google</button>
-      <p style="margin-top: 10px">Don't have an account? <a href="Signup.html">Sign up</a></p>
-      
+      <a href="#" style="margin-right: 190px;">Forgot password?</a>
+      <button id="loginBtn" type="button" style="margin-top: 10px;" >Login</button>
+
+      <p style="margin-top: 5px;">or continue with</p>
+      <button type="button">
+        <img src="images/Google_logo.png" alt="Google" width="15" height="15" style="margin-right: 5px;"/> Google
+      </button>
+
+      <p style="margin-top: 10px;">Don't have an account? <a href="Signup.html">Sign up</a></p>
     </form>
   </div>
+
+  <!-- Scripts must use "type=module" -->
+  <script type="module" src="./firebase/config.js"></script>
+  <script type="module" src="./auth.js"></script>
 </body>
 </html>

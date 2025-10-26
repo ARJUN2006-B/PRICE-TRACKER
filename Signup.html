@@ -3,32 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login Page</title>
+  <title>Signup Page</title>
   <link rel="stylesheet" href="Signup.css" />
 </head>
 <body>
   <div class="Signup-container">
     <h2>Signup</h2>
-    <form>
+    <form id="signupForm">
       <div class="input-group">
         <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter your email" required />
+        <input type="email" id="signup-email" placeholder="Enter your email" required />
       </div>
       <div class="input-group">
-        <label for="password">Create Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required />
+        <label for="createPassword">Create Password</label>
+        <input type="password" id="signup-password" placeholder="Enter your password" required />
       </div>
-       <div class="input-group">
-        <label for="password">Confirm Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required />
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="signup-confirm-password" placeholder="Enter your password" required />
       </div>
-      <button type="submit">Signup</button>
-      
-     
-    
-      <p style="margin-top: 10px;">Already have an account ?<a href="Login.html">Login</a></p>
-      
+      <button type="submit" id="signupBtn">Signup</button>
+      <p style="margin-top: 10px;">Already have an account? <a href="Login.html" id="signupBtn">Login</a></p>
     </form>
   </div>
+
+  <script type="module" src="./firebase/config.js"></script>
+  <script type="module" src="./signup.js"></script>
+
 </body>
 </html>
