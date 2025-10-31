@@ -7,32 +7,13 @@
   <link rel="stylesheet" href="Profile.css" />
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo">PRICE TRACKER</div>
-    <ul class="nav-links">
-      <li><a href="home.html">Home</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="login.html">Login</a></li>
-      <li><a href="about.html">About</a></li>
-    </ul>
-  </nav>
-
-  <!-- Profile Section -->
-  <section class="profile-section">
-    <h2>My Profile</h2>
-    <div class="profile-card">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User" />
-      <h3>John Doe</h3>
-      <p>Email: johndoe@example.com</p>
-      <p>Member since: Jan 2025</p>
-      <button>Edit Profile</button>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 Price Tracker | All Rights Reserved</p>
-  </footer>
+<div id="profilePopup" style="display:none; position:fixed; top:60px; right:40px; z-index:1000;">
+  <div class="profile-card">
+    <img id="profilePic" src="" alt="Profile" style="width:60px; border-radius:30px;" />
+    <p id="profileName"></p>
+    <p id="profileEmail"></p>
+    <button id="logoutBtn" style="background:red;color:white;">Logout</button>
+  </div>
+</div>
 </body>
 </html>

@@ -16,11 +16,14 @@
     <div class="logo">PRICE TRACKER</div>
     <ul class="nav-links">
       <li><a href="Home.html">Home</a></li>
-      <li><a href="Profile.html">Profile</a></li>
+      <li><a href="#" id="profileNavTrigger">Profile</a></li>
+
     <li><a href="Login.html">Login</a></li>
     <li><a href="About.html">About</a></li>
     </ul>
   </nav>
+  <script src="profile.js"></script>
+
 
   <!-- Header Section -->
   <header>
@@ -74,6 +77,15 @@
   <p>© 2025 Price Tracker | All Rights Reserved</p>
 </footer>
 <script src="urlValidatescript.js"></script>
+<!-- Profile Popup -->
+<div id="profilePopup" style="display:none; position:fixed; top:70px; right:40px; z-index:1000;">
+  <div class="profile-card" style="background:white; padding:15px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:center; width:200px;">
+    <img id="profilePic" src="default.png" alt="Profile" style="width:60px; border-radius:50%;" />
+    <p id="profileName" style="font-weight:bold; margin:8px 0;">No Name</p>
+    <p id="profileEmail" style="font-size:13px; color:gray;">example@email.com</p>
+    <button id="logoutBtn" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Logout</button>
+  </div>
+</div>
 
 </body>
 </html>
