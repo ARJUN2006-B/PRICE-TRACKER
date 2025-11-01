@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner Page</title>
-    
-    <link rel="stylesheet" href="style.css"> 
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Scanner | Price Tracker</title>
+  <link rel="stylesheet" href="scanner.css"/>
 </head>
 <body>
-    <h1>Scan Product Barcode</h1>
+  <header class="scanner-header">
+    <h1>Product QR Scanner</h1>
+  </header>
 
-    <div id="barcode-reader" style="width: 300px; height: 300px;"></div>
+  <main class="scanner-container">
+    <div class="scanner-box">
+      <div id="barcode-reader"></div>
+      <p class="scan-instruction">Align the QR code inside the frame to scan automatically</p>
+    </div>
+  </main>
 
-    <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
 
 
-    <script src="scanner.js"></script>
-    
+  <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
+  <script src="scanner.js"></script>
 </body>
 </html>

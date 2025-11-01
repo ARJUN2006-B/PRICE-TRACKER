@@ -41,8 +41,15 @@
   <section class="search-section">
  <input type="text" id="productUrl" placeholder="Enter product URL" />
     <button onclick="validateUrl()" style="color: white;">Search</button>
-
+   
   </section>
+  <div class="barcode-reader">
+  <button type="button" class="barcode-btn" onclick="window.location.href='scanner.html'">
+    <img src="images/search-barcode.png" alt="Scan Barcode" />
+    <span>Scan Barcode</span>
+  </button>
+</div>
+
 
   <!-- Trending Products Section -->
   <section class="trending-section">
@@ -70,6 +77,8 @@
       </div>
     </div>
   </section>
+  
+
 <!-- Footer -->
 <footer>
   <p>© 2025 Price Tracker | All Rights Reserved</p>
