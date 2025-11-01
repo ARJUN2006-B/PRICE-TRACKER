@@ -1,3 +1,4 @@
+
 import { auth } from "./firebase/config.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
@@ -15,7 +16,7 @@ document.getElementById("signupBtn").addEventListener("click", async (e) => {
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     alert("Signup successful!");
-    window.location.href = "Login.html"; // redirect after signup
+    window.location.href = "index.html"; // redirect after signup
   } catch (error) {
     alert(error.message);
   }

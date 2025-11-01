@@ -26,7 +26,7 @@ document.getElementById("loginBtn").addEventListener("click", async (e) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     alert("Login successful!");
-    window.location.href = "profile.html"; // redirect after email login
+    window.location.href = "homePage.html"; // redirect after email login
   } catch (error) {
     alert(error.message);
   }

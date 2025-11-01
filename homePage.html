@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Price Tracker</title>
+  <link rel="stylesheet" href="home.css" />
+</head>
+
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">PRICE TRACKER</div>
+    <ul class="nav-links">
+      <li><a href="Home.html">Home</a></li>
+    <li><a href="Login.html">Login</a></li>
+    <li><a href="About.html">About</a></li>
+    </ul>
+  </nav>
+
+
+  <!-- Header Section -->
+  <header>
+    <h1>PRICE TRACKER</h1>
+    <p class="tagline">Find the best deals across your favorite stores in one click!</p>
+  </header>
+
+  <!-- Ecommerce Logos -->
+  <section class="logo-section">
+    <img src="images/Amazon_logo.png" alt="Amazon" />
+    <img src="images/flipkart_logo.png" alt="Flipkart" />
+    <img src="images/meesho_logo.png" alt="Meesho" />
+    <img src="images/jiomart-seeklogo.png" alt="Snapdeal" />
+  </section>
+
+  <!-- Search Bar -->
+  <section class="search-section">
+ <input type="text" id="productUrl" placeholder="Enter product URL" />
+    <button onclick="validateUrl()" style="color: white;">Search</button>
+
+  </section>
+
+  <!-- Trending Products Section -->
+  <section class="trending-section">
+    <h2>🔥 Trending Products</h2>
+    <div class="product-grid">
+      <div class="product-card">
+        <img src="images/airpod_img.png" alt="Headphones" />
+        <p>Airpods</p>
+        <span>₹599</span>
+      </div>
+      <div class="product-card">
+        <img src="images/samrtwatch_img.jpg" alt="Smartwatch" />
+        <p>Smartwatch</p>
+        <span>₹999</span>
+      </div>
+      <div class="product-card">
+        <img src="images/shoe_img.jpg" alt="Shoes" />
+        <p>Sports Shoes</p>
+        <span>₹699</span>
+      </div>
+      <div class="product-card">
+        <img src="images/gamingkeyboard_img.jpg" alt="Keyboard" />
+        <p>RGB Gaming Keyboard</p>
+        <span>₹1,499</span>
+      </div>
+    </div>
+  </section>
+<!-- Footer -->
+<footer>
+  <p>© 2025 Price Tracker | All Rights Reserved</p>
+</footer>
+<script src="urlValidatescript.js"></script>
+
+<script type="module" src="firebase/config.js"></script>
+<script type="module" src="Login.js"></script>
+</body>
+</html>
+
+</body>
+</html>

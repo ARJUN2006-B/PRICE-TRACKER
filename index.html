@@ -3,93 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Price Tracker</title>
-  <link rel="stylesheet" href="home.css" />
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <title>Login Page</title>
+  <link rel="stylesheet" href="Login.css" />
 </head>
 
-
 <body>
-
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo">PRICE TRACKER</div>
-    <ul class="nav-links">
-      <li><a href="Home.html">Home</a></li>
-      <li><a href="#" id="profileNavTrigger">Profile</a></li>
-
-    <li><a href="Login.html">Login</a></li>
-    <li><a href="About.html">About</a></li>
-    </ul>
-  </nav>
-  <script type="module" src="profile.js"></script>
-
-
-  <!-- Header Section -->
-  <header>
-    <h1>PRICE TRACKER</h1>
-    <p class="tagline">Find the best deals across your favorite stores in one click!</p>
-  </header>
-
-  <!-- Ecommerce Logos -->
-  <section class="logo-section">
-    <img src="images/Amazon_logo.png" alt="Amazon" />
-    <img src="images/flipkart_logo.png" alt="Flipkart" />
-    <img src="images/meesho_logo.png" alt="Meesho" />
-    <img src="images/jiomart-seeklogo.png" alt="Snapdeal" />
-  </section>
-
-  <!-- Search Bar -->
-  <section class="search-section">
- <input type="text" id="productUrl" placeholder="Enter product URL" />
-    <button onclick="validateUrl()" style="color: white;">Search</button>
-
-  </section>
-
-  <!-- Trending Products Section -->
-  <section class="trending-section">
-    <h2>🔥 Trending Products</h2>
-    <div class="product-grid">
-      <div class="product-card">
-        <img src="images/airpod_img.png" alt="Headphones" />
-        <p>Airpods</p>
-        <span>₹599</span>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form onsubmit="return false">
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="login-email" placeholder="Enter your email" required />
       </div>
-      <div class="product-card">
-        <img src="images/samrtwatch_img.jpg" alt="Smartwatch" />
-        <p>Smartwatch</p>
-        <span>₹999</span>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="login-password" placeholder="Enter your password" required />
       </div>
-      <div class="product-card">
-        <img src="images/shoe_img.jpg" alt="Shoes" />
-        <p>Sports Shoes</p>
-        <span>₹699</span>
-      </div>
-      <div class="product-card">
-        <img src="images/gamingkeyboard_img.jpg" alt="Keyboard" />
-        <p>RGB Gaming Keyboard</p>
-        <span>₹1,499</span>
-      </div>
-    </div>
-  </section>
-<!-- Footer -->
-<footer>
-  <p>© 2025 Price Tracker | All Rights Reserved</p>
-</footer>
-<script src="urlValidatescript.js"></script>
-<!-- Profile Popup -->
-<div id="profilePopup" style="display:none; position:fixed; top:70px; right:40px; z-index:1000;">
-  <div class="profile-card" style="background:white; padding:15px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:center; width:200px;">
-    <img id="profilePic" src="default.png" alt="Profile" style="width:60px; border-radius:50%;" />
-    <p id="profileName" style="font-weight:bold; margin:8px 0;">No Name</p>
-    <p id="profileEmail" style="font-size:13px; color:gray;">example@email.com</p>
-    <button id="logoutBtn" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Logout</button>
+
+      <a href="#" style="margin-right: 170px;">Forgot password?</a>
+      <button id="loginBtn" type="button" style="margin-top: 10px;" >Login</button>
+
+      <p style="margin-top: 5px;">or continue with</p>
+      <button type="button" id="googleSignInBtn">
+        <img src="images/Google_logo.png" alt="Google" width="15" height="15" style="margin-right: 5px;"/> Google
+      </button>
+
+      <p style="margin-top: 10px;">Don't have an account? <a href="Signup.html">Sign up</a></p>
+    </form>
   </div>
-</div>
-<script type="module" src="firebase/config.js"></script>
-<script type="module" src="profile.js"></script>
-</body>
-</html>
+
+  <!-- Scripts must use "type=module" -->
+  <script type="module" src="./firebase/config.js"></script>
+  <script type="module" src="./login.js"></script>
 
 </body>
 </html>
