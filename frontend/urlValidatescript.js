@@ -23,5 +23,5 @@ function validateUrl() {
   }
 
   // Redirect to price.html with encoded URL
-  window.location.href = `price.html?productUrl=${encodeURIComponent(urlInput)}`;
+  window.location.href = `pricehistory.html?productUrl=${encodeURIComponent(urlInput)}`;
 }
