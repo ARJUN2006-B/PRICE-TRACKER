@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraper Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input { width: 400px; padding: 10px; }
+        button { padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Amazon Price Scraper</h1>
+    <p>Paste an Amazon product link below and click "Get Price"</p>
+    
+    <input type="text" id="url-input" placeholder="https://www.amazon.com/...">
+    <button id="scrape-button">Get Price</button>
+   
+<h2 id="result-price"></h2>
+
+<hr>
+<h3>Track this Product</h3>
+<p>We'll email you when the price drops below your target.</p>
+
+<div>
+    <label for="target-price">Target Price:</label>
+    <input type="number" id="target-price" placeholder="e.g., 40000">
+</div>
+<div style="margin-top: 10px;">
+    <label for="user-email">Your Email:</label>
+    <input type="email" id="user-email" placeholder="you@example.com">
+</div>
+
+<button id="track-button" style="margin-top: 10px;">Track Price</button>
+<p id="track-status"></p>
+<script src="scraper.js"></script> </body>
+</html>
+   
