@@ -2,7 +2,9 @@
 **/node_modules
 
 # Ignore the secret key file
-server/serviceAccountKey.json
+serviceAccountKey.json
 
 # Ignore system files
 .DS_Store
+
+.env
