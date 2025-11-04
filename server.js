@@ -309,7 +309,7 @@ async function checkAllPrices() {
 // This schedules the 'checkAllPrices' function to run.
 // This example runs every 4 hours.
 // For testing, you can change it to '*/2 * * * *' to run every 2 minutes.
-cron.schedule('0 */4 * * *', () => {
+cron.schedule('* * * * *', () => {
     checkAllPrices();
 });
 app.listen(port, () => {
