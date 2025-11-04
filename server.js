@@ -144,70 +144,66 @@ async function saveCurrentPrice(productId) {
 }
 
 // =================================================================
-// --- 🚀 6. NEW WEB SCRAPER CODE 🚀 ---
+// --- 🚀 6. UNIVERSAL WEB SCRAPER CODE (Amazon, Flipkart, etc.) 🚀 ---
 // =================================================================
-// This is your NEW, improved scraping function
-// Paste this into server.js, replacing the old scrapeAmazonPrice function
 
-async function scrapeAmazonPrice(url) {
+async function scrapeUniversalPrice(url) {
     console.log(`Scraping URL: ${url}`);
-    
-    // 1. Launch the invisible browser
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-
-    // 2. Set a realistic "User-Agent" so Amazon thinks we are a real browser
     await page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
     );
 
-    // 3. Go to the URL (with a longer 60-second timeout)
-    await page.goto(url, { timeout: 60000 });
-
-    // 4. Get all the HTML from the page
+    await page.goto(url, { timeout: 60000, waitUntil: 'domcontentloaded' });
     const html = await page.content();
-
-    // 5. Close the browser
-    await browser.close();
-
-    // 6. Use Cheerio to "load" the HTML
     const $ = cheerio.load(html);
 
-    // 7. Find the price (same selector as before)
-    const priceString = $('span.a-offscreen').first().text();
-    
-    if (priceString) {
-        // --- THIS IS THE FIX ---
-        // Use a regular expression to find all digits and the decimal point
-        // This will work for "$45.99", "₹45,999", "€45,99", etc.
-        const priceMatch = priceString.match(/[\d,.]+/);
+    let priceText = '';
 
-        if (priceMatch) {
-            // Get the first match and remove commas
-            const cleanedPrice = priceMatch[0].replace(/,/g, '');
-            return parseFloat(cleanedPrice);
-        } else {
-            throw new Error('Could not parse price from string: ' + priceString);
-        }
-    } else {
-        throw new Error('Could not find price. Amazon HTML may have changed.');
+    if (url.includes('amazon')) {
+        priceText = $('span.a-offscreen').first().text();
+    } 
+    else if (url.includes('flipkart')) {
+        // Flipkart uses span elements with these classes
+        priceText = $('div._30jeq3._16Jk6d').first().text();
+    } 
+    else if (url.includes('snapdeal')) {
+        priceText = $('span.payBlkBig').first().text();
+    } 
+    else if (url.includes('croma')) {
+        priceText = $('span.pdp-price').first().text();
+    } 
+    else if (url.includes('reliancedigital')) {
+        priceText = $('span.pdp__offerPrice').first().text();
     }
+
+    await browser.close();
+
+    if (!priceText) throw new Error('Price not found. Site structure may have changed.');
+
+    // Extract only numbers and decimal points, remove commas or ₹ symbols
+    const match = priceText.match(/[\d,.]+/);
+    if (!match) throw new Error('Could not parse price text: ' + priceText);
+
+    const cleaned = match[0].replace(/,/g, '');
+    return parseFloat(cleaned);
 }
 
-// This is the new API route for scraping
+// --- API route to handle scraping ---
 app.post('/api/scrape-price', async (req, res) => {
     const { url } = req.body;
-    if (!url) {
-        return res.status(400).json({ message: 'URL is required' });
-    }
+    if (!url) return res.status(400).json({ message: 'URL is required' });
+
     try {
-        const price = await scrapeAmazonPrice(url);
-        res.json({ price: price });
+        const price = await scrapeUniversalPrice(url);
+        res.json({ price });
     } catch (error) {
-        console.error(error);
+        console.error('Scrape error:', error.message);
         res.status(500).json({ message: error.message });
     }
 });
+
 // =================================================================
 // --- 7. START THE SERVER ---
 // =================================================================

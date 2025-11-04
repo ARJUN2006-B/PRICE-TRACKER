@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Price Comparison</title>
+  <link rel="stylesheet" href="pricecomparison.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">PRICE TRACKER</div>
+    <ul class="nav-links">
+      <li><a href="Home.html">Home</a></li>
+      <li><a href="About.html">About</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h1>Price Comparison</h1>
+    <p id="productTitle">Fetching product details...</p>
+
+    <div class="price-results">
+      <div class="card">
+        <h2>Amazon</h2>
+        <p class="price" id="amazonPrice">Loading...</p>
+      </div>
+      <div class="card">
+        <h2>Flipkart</h2>
+        <p class="price" id="flipkartPrice">Loading...</p>
+      </div>
+      <div class="card">
+        <h2>Meesho</h2>
+        <p class="price" id="meeshoPrice">Loading...</p>
+      </div>
+    </div>
+
+    <div class="loading" id="loading">⏳ Fetching prices...</div>
+  </main>
+
+  <script src="pricecomparison.js"></script>
+</body>
+</html>
