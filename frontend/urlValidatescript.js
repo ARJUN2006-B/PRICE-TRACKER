@@ -1,27 +1,21 @@
-function validateUrl() {
-  const urlInput = document.getElementById("productUrl").value.trim();
+// urlValidatescript.js
 
-  if (!urlInput) {
+function validateUrl() {
+  const input = document.getElementById("productUrl").value.trim();
+  if (!input) {
     alert("Please enter a product URL!");
     return;
   }
 
-  let url;
-  try {
-    url = new URL(urlInput);
-  } catch {
-    alert("Invalid URL format.");
+  const validDomains = ["amazon", "flipkart", "meesho", "jiomart"];
+  const isValid = validDomains.some(domain => input.includes(domain));
+
+  if (!isValid) {
+    alert("Please enter a valid product URL (Amazon, Flipkart, Meesho, or JioMart)");
     return;
   }
 
-  const allowedSites = ["amazon", "flipkart", "meesho"];
-  const isValidSite = allowedSites.some(site => url.hostname.includes(site));
-
-  if (!isValidSite) {
-    alert("Unsupported e-commerce site. Only Amazon, Flipkart, and Meesho are supported.");
-    return;
-  }
-
-  // Redirect to price.html with encoded URL
-  window.location.href = `pricehistory.html?productUrl=${encodeURIComponent(urlInput)}`;
+  // ✅ Redirect to pricecomparison.html with encoded URL
+  const encodedUrl = encodeURIComponent(input);
+  window.location.href = `pricecomparison.html?productUrl=${encodedUrl}`;
 }

@@ -9,6 +9,8 @@ require('dotenv').config();
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY); // <-- ❗️ PASTE YOUR KEY
 
+
+
 // --- 1. FIREBASE SETUP ---
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
@@ -203,6 +205,41 @@ app.post('/api/scrape-price', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+// =================================================================
+// --- 🚀 6B. API ROUTE — Compare Prices Across Platforms ---
+// =================================================================
+app.post('/api/compare-prices', async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ message: "URL required" });
+
+  try {
+    // Define supported platforms
+    const platforms = [
+      { platform: "Amazon", link: url.replace(/flipkart|meesho|jiomart/gi, "amazon") },
+      { platform: "Flipkart", link: url.replace(/amazon|meesho|jiomart/gi, "flipkart") },
+      { platform: "Meesho", link: url.replace(/amazon|flipkart|jiomart/gi, "meesho") }
+    ];
+
+    const results = [];
+
+    // Loop through each platform and scrape the price
+    for (const p of platforms) {
+      try {
+        const price = await scrapeUniversalPrice(p.link);
+        results.push({ platform: p.platform, price, link: p.link });
+      } catch (err) {
+        results.push({ platform: p.platform, price: null, link: p.link });
+      }
+    }
+
+    res.json({ results });
+  } catch (err) {
+    console.error("Error in /api/compare-prices:", err.message);
+    res.status(500).json({ message: "Failed to fetch comparison prices" });
+  }
+});
+
 
 // =================================================================
 // --- 7. START THE SERVER ---

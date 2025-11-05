@@ -5,15 +5,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const productUrl = params.get("productUrl");
 
   if (!productUrl) {
-    alert("No product URL provided!");
+    alert("No product URL found! Please go back and enter a link.");
     return;
   }
 
-  const container = document.getElementById("comparisonResults");
-  container.innerHTML = "<p>Fetching prices, please wait...</p>";
+  document.getElementById("productTitle").textContent = `Comparing prices for: ${productUrl}`;
+  document.getElementById("loading").style.display = "block";
 
   try {
-    // Call your Node.js backend (server.js)
+    // ✅ Send the URL to your backend route
     const response = await fetch("http://localhost:3000/api/compare-prices", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -21,35 +21,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     const data = await response.json();
+    document.getElementById("loading").style.display = "none";
 
     if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch prices");
+      throw new Error(data.message || "Failed to fetch prices");
     }
 
-    // Display results
-    displayResults(data.results);
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    // ✅ Fill in each platform price
+    data.results.forEach((result) => {
+      const id = result.platform.toLowerCase() + "Price";
+      const priceElement = document.getElementById(id);
+      if (priceElement) {
+        if (result.price) {
+          priceElement.textContent = `₹${result.price}`;
+        } else {
+          priceElement.textContent = "Not available";
+        }
+      }
+    });
+  } catch (error) {
+    document.getElementById("loading").style.display = "none";
+    alert("Error fetching comparison prices: " + error.message);
   }
 });
-
-function displayResults(results) {
-  const container = document.getElementById("comparisonResults");
-  container.innerHTML = `
-    <h2>💰 Price Comparison</h2>
-    <div class="price-grid">
-      ${results
-        .map(
-          r => `
-        <div class="price-card">
-          <h3>${r.platform}</h3>
-          <p class="price">${r.price ? "₹" + r.price : "❌ Not available"}</p>
-          <a href="${r.link}" target="_blank">View on ${r.platform}</a>
-        </div>
-      `
-        )
-        .join("")}
-    </div>
-  `;
-}
