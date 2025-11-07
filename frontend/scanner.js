@@ -17,30 +17,45 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log(`Fetching data from: ${url}`);
 
         fetch(url)
-            .then(response => {
-                // Check if the server responded with an error (like 404 or 500)
-                if (!response.ok) {
-                    throw new Error('Product not found or server error');
+            // ... inside fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Product not found or server error');
+            }
+            return response.json();
+        })
+        // --- REPLACE THIS BLOCK ---
+        .then(data => {
+            // 'data' is our new object: { product: {...}, prices: [...] }
+            console.log("Success! Received product data:", data);
+
+            // Find the best price from the results
+            let bestPrice = null;
+            let amazonPrice = "Not found";
+
+            for (const item of data.prices) {
+                if (item.platform === 'Amazon') {
+                    amazonPrice = item.price ? `₹${item.price}` : "Not found";
                 }
-                // If the response is good, parse it as JSON
-                return response.json();
-            })
-            .then(productData => {
-                // SUCCESS! 'productData' is the JSON from your backend.
-                console.log("Success! Received product data:", productData);
-                
-                // You can now show this data on your page.
-                // For a simple test, just show an alert:
-                alert(`Product Found: ${productData.product.brand} ${productData.product.title}`);
-                
-                // In your real project, you would redirect to a product page:
-                // window.location.href = `/pricehistory.html?barcode=${decodedText}`;
-            })
-            .catch(error => {
-                // This runs if the 'fetch' fails or if you threw an error.
-                console.error("Error fetching product data:", error);
-                alert("Error: Could not get product details.");
-            });
+                if (item.price && (bestPrice === null || item.price < bestPrice)) {
+                    bestPrice = item.price;
+                }
+            }
+
+            // Show a useful alert with the price
+            alert(
+                `Product: ${data.product.name}\n` +
+                `Amazon Price: ${amazonPrice}\n` +
+                `Best Price: ${bestPrice ? `₹${bestPrice}` : 'Not found'}`
+            );
+
+            // Now, redirect to the history page
+            //window.location.href = `pricehistory.html?barcode=${data.product.barcode}`;
+        })
+        // --- END OF REPLACEMENT ---
+        .catch(error => {
+            // ... (your existing catch block) ...
+        });
     }
 
     // This function gets called if the scan fails (optional)
@@ -64,5 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 2. Start the scanner
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    window.location.href = `product.html?barcode=${scannedBarcode}`;
+
 
 });
