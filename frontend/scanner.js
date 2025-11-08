@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
             );
 
             // Now, redirect to the history page
-            //window.location.href = `pricehistory.html?barcode=${data.product.barcode}`;
+            window.location.href = `product.html?barcode=${data.product.barcode}`;
         })
         // --- END OF REPLACEMENT ---
         .catch(error => {
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 2. Start the scanner
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    window.location.href = `product.html?barcode=${scannedBarcode}`;
+ //   window.location.href = `product.html?barcode=${scannedBarcode}`;
 
 
 });
