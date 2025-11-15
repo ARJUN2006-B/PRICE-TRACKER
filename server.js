@@ -1,18 +1,15 @@
-// THIS IS YOUR NEW, COMPLETE server.js FILE (Hybrid + Clean Title Fix)
+// THIS IS THE SIMPLE server.js (ScraperAPI + Notifier + Barcode)
 require('dotenv').config(); // MUST be at the top
 
 // --- Main Tools ---
 const express = require('express');
-const axios = require('axios'); // Still need for barcode API
+const axios = require('axios'); // We use Axios for everything
 const cors = require('cors');
 const cheerio = require('cheerio'); // For parsing HTML
 
 // --- Firebase Admin ---
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccountKey.json');
-
-// --- Google Shopping API ---
-const { getJson } = require("serpapi"); // This is the new tool
 
 // --- Notifier Tools ---
 const sgMail = require('@sendgrid/mail');
@@ -42,18 +39,7 @@ app.use(express.json());
 // =================================================================
 
 // --- ScraperAPI URL ---
-// We use render=true and country_code=in to get the best results
 const scraperApiUrl = `http://api.scraperapi.com?api_key=${process.env.SCRAPERAPI_KEY}&render=true&country_code=in`;
-
-/**
- * Cleans a messy product title for better searching.
- */
-function cleanProductTitle(title) {
-    // Get text before a | or a \
-    let cleaned = title.split('|')[0].split('\\')[0].trim();
-    console.log(`Cleaned title for search: ${cleaned}`);
-    return cleaned;
-}
 
 /**
  * Cleans an Amazon URL to its basic /dp/ASIN form.
@@ -63,7 +49,9 @@ function cleanAmazonUrl(url) {
         const match = url.match(/\/dp\/([A-Z0-9]{10})/);
         if (match && match[1]) {
             const asin = match[1];
-            return `https://www.amazon.in/dp/${asin}`;
+            const cleanUrl = `https://www.amazon.in/dp/${asin}`;
+            console.log(`Cleaned Amazon URL to: ${cleanUrl}`);
+            return cleanUrl;
         }
         return url; // Return original if pattern not found
     } catch (e) {
@@ -71,13 +59,11 @@ function cleanAmazonUrl(url) {
     }
 }
 
-
 // --- SCRAPERS (Get data from a specific product URL) ---
-// These use ScraperAPI to get the initial title
-
+// We will just use these for the notifier.
 async function getAmazonData(url) {
     console.log(`Scraping Amazon URL with ScraperAPI: ${url}`);
-    const cleanUrl = cleanAmazonUrl(url); // Clean the URL first
+    const cleanUrl = cleanAmazonUrl(url); // Clean the URL
     const html = await axios.get(`${scraperApiUrl}&url=${cleanUrl}`);
     const $ = cheerio.load(html.data);
     const title = $('#productTitle').text().trim();
@@ -118,124 +104,44 @@ async function getMeeshoData(url) {
     return { title, price, link: url };
 }
 
-// --- SEARCHER (Search Google Shopping for a title) ---
-async function searchAllSites(productTitle) {
-    console.log(`Searching Google Shopping for: ${productTitle}`);
-    const params = {
-        api_key: process.env.SERPAPI_KEY, // Get key from .env
-        engine: "google_shopping",
-        q: productTitle,
-        google_domain: "google.co.in",
-        gl: "in",
-        hl: "en",
-        num: 10 // Get top 10 results
-    };
-
-    try {
-        const data = await getJson(params);
-        const shoppingResults = data.shopping_results || [];
-
-        let amazon = { platform: 'Amazon', price: null, link: '#' };
-        let flipkart = { platform: 'Flipkart', price: null, link: '#' };
-        let meesho = { platform: 'Meesho', price: null, link: '#' };
-        
-        // "Smart" filter to ignore accessories
-        const accessoryKeywords = ['case', 'cover', 'charger', 'cable', 'screen protector', 'tempered glass', 'holder'];
-
-        for (const item of shoppingResults) {
-            const source = item.source ? item.source.toLowerCase() : "";
-            const title = item.title ? item.title.toLowerCase() : "";
-            const price = item.extracted_price;
-            const link = item.link;
-
-            let isAccessory = false;
-            for (const keyword of accessoryKeywords) {
-                if (title.includes(keyword)) {
-                    isAccessory = true;
-                    break; 
-                }
-            }
-            if (isAccessory) {
-                console.log(`Ignoring accessory: ${title}`);
-                continue; // Skip this item
-            }
-
-            if (source.includes("amazon.in") && !amazon.price) {
-                amazon = { platform: 'Amazon', price: price, link: link };
-            }
-            if (source.includes("flipkart.com") && !flipkart.price) {
-                flipkart = { platform: 'Flipkart', price: price, link: link };
-            }
-            if (source.includes("meesho.com") && !meesho.price) {
-                meesho = { platform: 'Meesho', price: price, link: link };
-            }
-        }
-        return [amazon, flipkart, meesho];
-    } catch (e) {
-        console.error("SerpApi search failed:", e.message);
-        throw new Error("Failed to search Google Shopping.");
-    }
-}
 
 // =================================================================
 // --- 3. API ROUTES ---
 // =================================================================
 
-// --- SMART API ROUTE FOR PRICE COMPARISON ---
-app.post('/api/compare-prices', async (req, res) => {
+// --- This is the route your "Get Price" button calls ---
+app.post('/api/scrape-price', async (req, res) => {
     const { url } = req.body;
     if (!url) {
         return res.status(400).json({ message: 'URL is required' });
     }
 
-    let initialData;
-    let productTitle;
-    let initialPlatform;
-
     try {
-        // Step 1: Detect link and scrape initial product data
+        let price;
+        // Detect which site to scrape
         if (url.includes('amazon.in')) {
-            initialData = await getAmazonData(url);
-            initialPlatform = "Amazon";
+            const data = await getAmazonData(url);
+            price = data.price;
         } else if (url.includes('flipkart.com')) {
-            initialData = await getFlipkartData(url);
-            initialPlatform = "Flipkart";
+            const data = await getFlipkartData(url);
+            price = data.price;
         } else if (url.includes('meesho.com')) {
-            initialData = await getMeeshoData(url);
-            initialPlatform = "Meesho";
+            const data = await getMeeshoData(url);
+            price = data.price;
         } else {
             return res.status(400).json({ message: 'URL must be from Amazon, Flipkart, or Meesho.' });
         }
         
-        productTitle = initialData.title;
-        if (!productTitle) {
-             return res.status(500).json({ message: 'Could not get product title from link. ScraperAPI may be blocked.' });
-        }
-
-        const cleanedTitle = cleanProductTitle(productTitle);
-
-        // Step 2: Search all sites using SerpApi with the CLEAN title
-        const searchResults = await searchAllSites(cleanedTitle);
-        
-        // Step 3: Bundle results
-        const finalResults = searchResults.map(result => {
-            // Use the price from the *original link* because it's most accurate
-            if (result.platform === initialPlatform) {
-                return { platform: initialPlatform, price: initialData.price, link: url };
-            }
-            return result;
-        });
-
-        res.json({ results: finalResults });
+        res.json({ price: price });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+        console.error("Scrape Error in API route:", error.message);
+        res.status(500).json({ message: "Could not get a price. The site may be blocking us." });
     }
 });
 
 
-// --- BARCODE SCANNER ROUTE ---
+// --- BARCODE SCANNER ROUTE (Old version with RANDOM price) ---
 app.get('/api/product/barcode/:barcodeNumber', async (req, res) => {
     const { barcodeNumber } = req.params;
     try {
@@ -256,10 +162,10 @@ app.get('/api/product/barcode/:barcodeNumber', async (req, res) => {
             };
             
             const response = await axios.request(options);
-            if (!response.data || !response.data.product || response.data.product.length === 0) {
+            if (!response.data || !response.data.product || (Array.isArray(response.data.product) && response.data.product.length === 0)) {
                 throw new Error('Barcode not found in RapidAPI database');
             }
-            const product = response.data.product[0] || response.data.product; 
+            const product = Array.isArray(response.data.product) ? response.data.product[0] : response.data.product; 
 
             productData = {
                 name: product.title || "N/A",
@@ -276,25 +182,16 @@ app.get('/api/product/barcode/:barcodeNumber', async (req, res) => {
             productData = productDoc.data();
         }
 
-        const cleanedTitle = cleanProductTitle(productData.name);
-        const searchResults = await searchAllSites(cleanedTitle);
-
-        let lowestPrice = null;
-        for (const result of searchResults) {
-            if (result.price && (lowestPrice === null || result.price < lowestPrice)) {
-                lowestPrice = result.price;
-            }
-        }
-
-        if (lowestPrice) {
-            const priceData = { price: lowestPrice, date: new Date() };
-            await db.collection('products').doc(productId).collection('prices').add(priceData);
-            console.log(`Saved new real price ${lowestPrice} for product ${productId}`);
-        }
+        // --- Save a RANDOM price to the history ---
+        await saveCurrentPrice(productId); 
         
         res.json({
-            product: productData,
-            prices: searchResults // Send the full comparison
+            // This is the "flat" object your scanner.js was expecting
+            id: productId,
+            name: productData.name,
+            brand: productData.brand,
+            image_url: productData.image_url,
+            barcode: productData.barcode
         });
 
     } catch (error) {
@@ -303,7 +200,7 @@ app.get('/api/product/barcode/:barcodeNumber', async (req, res) => {
     }
 });
 
-// --- PRICE HISTORY/GRAPH ROUTE ---
+// --- PRICE HISTORY/GRAPH ROUTE (Unchanged) ---
 app.get('/api/product/history/:barcode', async (req, res) => {
     const { barcode } = req.params;
     try {
@@ -341,7 +238,7 @@ app.get('/api/product/history/:barcode', async (req, res) => {
 // --- 4. PRICE TRACKER & NOTIFIER LOGIC ---
 // =================================================================
 
-// --- This is the route your "Track Price" button calls ---
+// --- This is the route your "Track Price" button calls (Unchanged) ---
 app.post('/api/track', async (req, res) => {
     const { url, targetPrice, email } = req.body;
     if (!url || !targetPrice || !email) {
@@ -363,7 +260,18 @@ app.post('/api/track', async (req, res) => {
     }
 });
 
-// --- Email Notifier Function ---
+// --- Helper function for barcode scanner (uses random price) ---
+async function saveCurrentPrice(productId) {
+    const randomPrice = (Math.random() * 10 + 2).toFixed(2);
+    const priceData = {
+        price: parseFloat(randomPrice),
+        date: new Date()
+    };
+    await db.collection('products').doc(productId).collection('prices').add(priceData);
+    console.log(`Saved new random price ${randomPrice} for product ${productId}`);
+}
+
+// --- Email Notifier Function (Unchanged) ---
 async function sendNotificationEmail(toEmail, productUrl, targetPrice, currentPrice) {
     const msg = {
         to: toEmail,
@@ -398,7 +306,6 @@ async function checkAllPrices() {
         
         try {
             // --- 🚀 NEW RELIABLE SCRAPING 🚀 ---
-            // We use ScraperAPI to get the single-page price
             let currentPrice = null;
             let data;
             

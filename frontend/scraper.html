@@ -3,37 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scraper Test</title>
+    <title>Amazon Price Scraper</title>
     <style>
         body { font-family: sans-serif; padding: 20px; }
         input { width: 400px; padding: 10px; }
         button { padding: 10px; }
+        .track-group { display: flex; gap: 20px; margin: 20px 0; }
+        .track-group > div { display: flex; flex-direction: column; }
+        .track-group label { font-weight: bold; margin-bottom: 5px; }
+        .track-group input { padding: 10px; font-size: 1em; }
+        #track-button {
+            padding: 10px 20px; font-size: 1em; background-color: #28a745;
+            color: white; border: none; cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h1>Amazon Price Scraper</h1>
     <p>Paste an Amazon product link below and click "Get Price"</p>
     
-    <input type="text" id="url-input" placeholder="https://www.amazon.com/...">
+    <input type="text" id="url-input" placeholder="https://www.amazon.in/...">
     <button id="scrape-button">Get Price</button>
-   
-<h2 id="result-price"></h2>
+    
+    <h2 id="result-price"></h2>
 
-<hr>
-<h3>Track this Product</h3>
-<p>We'll email you when the price drops below your target.</p>
+    <hr style="margin-top: 30px;">
+    <h3>Set a Price Alert</h3>
+    <p>We'll email you when the price at the link you pasted drops below your target.</p>
+    
+    <div class="track-group">
+        <div>
+            <label for="target-price">Target Price (₹):</label>
+            <input type="number" id="target-price" placeholder="e.g., 40000">
+        </div>
+        <div>
+            <label for="user-email">Your Email:</label>
+            <input type="email" id="user-email" placeholder="you@example.com">
+        </div>
+    </div>
+    
+    <button id="track-button">Track Price</button>
+    <p id="track-status" style="font-weight: bold;"></p>
 
-<div>
-    <label for="target-price">Target Price:</label>
-    <input type="number" id="target-price" placeholder="e.g., 40000">
-</div>
-<div style="margin-top: 10px;">
-    <label for="user-email">Your Email:</label>
-    <input type="email" id="user-email" placeholder="you@example.com">
-</div>
-
-<button id="track-button" style="margin-top: 10px;">Track Price</button>
-<p id="track-status"></p>
-<script src="scraper.js"></script> </body>
+    <script src="scraper.js?v=4.0"></script>
+</body>
 </html>
-   

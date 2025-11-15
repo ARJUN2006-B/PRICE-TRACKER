@@ -1,10 +1,19 @@
+// This file handles BOTH scraping and tracking
+
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- Part 1: Get Price Button Elements ---
     const urlInput = document.getElementById('url-input');
     const scrapeButton = document.getElementById('scrape-button');
     const resultPrice = document.getElementById('result-price');
 
-    // Listen for a click on the button
+    // --- Part 2: Track Button Elements ---
+    const trackButton = document.getElementById('track-button');
+    const trackStatus = document.getElementById('track-status');
+    const targetPriceInput = document.getElementById('target-price');
+    const emailInput = document.getElementById('user-email');
+
+    // --- Logic for "Get Price" Button ---
     scrapeButton.addEventListener('click', () => {
         
         const url = urlInput.value;
@@ -24,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ url: url }) // Send the URL in the body
         })
         .then(response => {
-            // This part is improved to show better errors
             if (!response.ok) {
                 // Get the error message from the server and throw it
                 return response.json().then(err => { throw new Error(err.message) });
@@ -33,33 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             // Success!
-            resultPrice.innerText = `The price is: $${data.price}`;
+            resultPrice.innerText = `The price is: ₹${data.price}`; // Changed to Rupee symbol
         })
         .catch(error => {
             console.error('Fetch error:', error);
-            // This will now show the real error, like "Could not find price"
             resultPrice.innerText = `Error: ${error.message}`;
         });
     });
-});
-// This code runs when the 'scraper.html' page loads
-document.addEventListener('DOMContentLoaded', () => {
 
-    // ... all your existing code for "Get Price" button ...
-    const scrapeButton = document.getElementById('scrape-button');
-    // ... etc ...
-
-    // 🚀 NEW CODE FOR THE "TRACK" BUTTON 🚀
-    const trackButton = document.getElementById('track-button');
-    const trackStatus = document.getElementById('track-status');
-
+    // --- Logic for "Track Price" Button ---
     trackButton.addEventListener('click', () => {
-        const url = document.getElementById('url-input').value;
-        const targetPrice = document.getElementById('target-price').value;
-        const email = document.getElementById('user-email').value;
+        const url = urlInput.value;
+        const targetPrice = targetPriceInput.value;
+        const email = emailInput.value;
 
         if (!url || !targetPrice || !email) {
-            trackStatus.innerText = "Please fill in all fields.";
+            trackStatus.innerText = "Please fill in all fields (URL, Target Price, and Email).";
             trackStatus.style.color = 'red';
             return;
         }
@@ -89,9 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(error => {
-            trackStatus.innerText = error.message;
+            trackStatus.innerText = `Error: ${error.message}`;
             trackStatus.style.color = 'red';
         });
     });
 
-}); // This closes the main DOMContentLoaded
+}); // This closes the ONE main DOMContentLoaded listener
