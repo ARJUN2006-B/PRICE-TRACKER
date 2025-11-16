@@ -9,6 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",
     "axios": "^1.13.1",
@@ -16,10 +17,11 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "firebase-admin": "^13.5.0",
+    "firebase-admin": "^13.6.0",
     "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.10",
-    "puppeteer": "^24.27.0",
+    "puppeteer": "^24.30.0",
     "serpapi": "^2.2.1"
   }
 }

@@ -83,13 +83,72 @@
 <footer>
   <p>© 2025 Price Tracker | All Rights Reserved</p>
 </footer>
-<script src="urlValidatescript.js"></script>
 
-<script type="module" src="firebase/config.js"></script>
-<script type="module" src="Login.js"></script>
-<script type="module" src="./homePage.js"></script>
-</body>
-</html>
+<script>
+
+async function validateUrl() {
+  const input = document.getElementById("productUrl");
+  if (!input) {
+    alert("Product URL input not found");
+    return;
+  }
+
+  const url = input.value.trim();
+  if (!url) {
+    alert("Please enter a product URL");
+    return;
+  }
+
+  if (!url.includes("amazon.")) {
+    alert("Only Amazon product URLs are supported right now.");
+    return;
+  }
+
+  const asin = extractASIN(url);
+  if (!asin) {
+    alert("Couldn't extract ASIN from this URL.");
+    return;
+  }
+
+  try {
+    // call your backend to scrape + save
+    const res = await fetch("http://localhost:3000/api/fetch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+
+    const data = await res.json();
+    console.log("Backend response:", data);
+
+    if (!res.ok || data.error) {
+      alert("Server error: " + (data.error || "Unknown error"));
+      return;
+    }
+
+    // redirect to product page with asin
+    window.location.href = `product.html?asin=${asin}`;
+  } catch (err) {
+    console.error(err);
+    alert("Failed to reach backend. Is server running on http://localhost:3000 ?");
+  }
+}
+
+function extractASIN(url) {
+  const patterns = [
+    /\/dp\/([A-Z0-9]{10})/i,
+    /\/gp\/product\/([A-Z0-9]{10})/i,
+    /\/product\/([A-Z0-9]{10})/i,
+    /\/([A-Z0-9]{10})(?:[/?]|$)/i,
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+</script>
 
 </body>
 </html>
