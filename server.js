@@ -1,5 +1,5 @@
 // server.js
-
+import cron from "node-cron";
 import express from "express";
 import cors from "cors";
 import fs from "fs";
@@ -164,6 +164,54 @@ app.get("/api/prices/:asin", async (req, res) => {
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------- DAILY PRICE UPDATER --------------------
+cron.schedule("0 0 * * *", async () => {
+  console.log("⏰ Running daily price update...");
+
+  try {
+    const productsSnapshot = await db.collection("products").get();
+
+    for (const doc of productsSnapshot.docs) {
+      const item = doc.data();
+      const asin = item.asin;
+      const url = item.url;
+
+      console.log(`Updating product: ${asin}`);
+
+      // Call the same API you use in /api/fetch
+      const API_URL = `https://api.npoint.io/amazon/product?url=${encodeURIComponent(url)}`;
+      const res = await fetch(API_URL);
+      const product = await res.json();
+
+      if (!product.price) {
+        console.log("⚠ Failed to update", asin);
+        continue;
+      }
+
+      // Save latest price
+      await db.collection("products").doc(asin).update({
+        last_price: product.price,
+        updated_at: new Date(),
+      });
+
+      await db.collection("products")
+        .doc(asin)
+        .collection("history")
+        .add({
+          price: product.price,
+          timestamp: new Date(),
+        });
+
+      console.log(`✅ Updated ${asin} → ₹${product.price}`);
+    }
+
+    console.log("🎉 Daily update completed");
+
+  } catch (err) {
+    console.error("❌ Daily updater crashed:", err);
   }
 });
 
