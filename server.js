@@ -1,5 +1,5 @@
 // server.js
-import cron from "node-cron";
+
 import express from "express";
 import cors from "cors";
 import fs from "fs";
@@ -8,6 +8,7 @@ import fetch from "node-fetch";
 import puppeteer from "puppeteer";
 import admin from "firebase-admin";
 import { fileURLToPath } from "url";
+import cron from "node-cron";
 
 // Fix __dirname (ESM)
 const __filename = fileURLToPath(import.meta.url);
@@ -56,9 +57,7 @@ async function scrapeAmazon(url) {
   });
 
   const page = await browser.newPage();
-  await page.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-  );
+  await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
 
   console.log("Opening:", url);
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 40000 });
@@ -85,7 +84,7 @@ async function scrapeAmazon(url) {
   return data;
 }
 
-// ---------------- /api/fetch ----------------
+// ---------------- /api/fetch (manual add) ----------------
 app.post("/api/fetch", async (req, res) => {
   try {
     const { url } = req.body;
@@ -107,10 +106,8 @@ app.post("/api/fetch", async (req, res) => {
       return res.status(500).json({ error: "Failed to extract product" });
     }
 
-    // Cleanup price ₹
     const cleanPrice = Number(product.price.replace(/[₹,]/g, ""));
 
-    // Save in Firestore
     const ref = db.collection("products").doc(asin);
 
     await ref.set(
@@ -167,52 +164,57 @@ app.get("/api/prices/:asin", async (req, res) => {
   }
 });
 
-// -------------------- DAILY PRICE UPDATER --------------------
-cron.schedule("0 0 * * *", async () => {
-  console.log("⏰ Running daily price update...");
+// ------------------------------------------------------------
+// 🔥 DAILY PRICE UPDATER (9AM IST) — USING PUPPETEER
+// ------------------------------------------------------------
+cron.schedule("55 10 * * *", async () => {
+  console.log("⏰ DAILY CRON STARTED at 9AM IST");
 
   try {
     const productsSnapshot = await db.collection("products").get();
+    console.log("🟢 Total products:", productsSnapshot.size);
 
     for (const doc of productsSnapshot.docs) {
       const item = doc.data();
       const asin = item.asin;
       const url = item.url;
 
-      console.log(`Updating product: ${asin}`);
+      console.log(`🔍 Updating: ${asin}`);
 
-      // Call the same API you use in /api/fetch
-      const API_URL = `https://api.npoint.io/amazon/product?url=${encodeURIComponent(url)}`;
-      const res = await fetch(API_URL);
-      const product = await res.json();
+      const product = await scrapeAmazon(url);
 
-      if (!product.price) {
-        console.log("⚠ Failed to update", asin);
+      if (!product || !product.price) {
+        console.log("❌ Failed to extract price for", asin);
         continue;
       }
 
-      // Save latest price
-      await db.collection("products").doc(asin).update({
-        last_price: product.price,
-        updated_at: new Date(),
+      const newPrice = Number(product.price.replace(/[₹,]/g, ""));
+
+      const ref = db.collection("products").doc(asin);
+
+      await ref.set(
+        {
+          last_price: newPrice,
+          updated_at: new Date()
+        },
+        { merge: true }
+      );
+
+      await ref.collection("history").add({
+        price: newPrice,
+        timestamp: new Date()
       });
 
-      await db.collection("products")
-        .doc(asin)
-        .collection("history")
-        .add({
-          price: product.price,
-          timestamp: new Date(),
-        });
-
-      console.log(`✅ Updated ${asin} → ₹${product.price}`);
+      console.log(`✅ Updated ${asin}: ₹${newPrice}`);
     }
 
-    console.log("🎉 Daily update completed");
+    console.log("🎉 Daily update completed!");
 
   } catch (err) {
-    console.error("❌ Daily updater crashed:", err);
+    console.error("🔥 Daily updater crashed:", err);
   }
+}, {
+  timezone: "Asia/Kolkata"
 });
 
 // ---------------- START ----------------
