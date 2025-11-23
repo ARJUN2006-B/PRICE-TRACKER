@@ -33,6 +33,8 @@ const fcm = admin.messaging();
 const app  = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "frontend")));
+
 const PORT = process.env.PORT || 3000;
 
 // ---------------- EMAIL (nodemailer) ----------------
@@ -74,31 +76,50 @@ function priceTextToNumber(txt) {
 // Puppeteer scrape (returns {title, priceText, image})
 async function scrapeAmazon(url) {
   console.log("Launching Puppeteer for", url);
+
   const browser = await puppeteer.launch({
-    headless: "new",
+    headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
 
   try {
     const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 40000 });
+
+    // full user agent
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    );
+
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 45000 });
+
+    // IMPORTANT: wait for price to appear
+    await page.waitForSelector(".a-price .a-offscreen", { timeout: 15000 });
 
     const data = await page.evaluate(() => {
       const title = document.querySelector("#productTitle")?.innerText?.trim() || null;
+
       const price =
-        document.querySelector(".a-price .a-offscreen")?.innerText ||
-        document.querySelector("#priceblock_ourprice")?.innerText ||
-        document.querySelector("#priceblock_dealprice")?.innerText ||
+        document.querySelector(".a-price .a-offscreen")?.innerText?.trim() ||
         null;
+
       const image =
         document.querySelector("#landingImage")?.src ||
         document.querySelector("#imgTagWrapperId img")?.src ||
         null;
+
       return { title, price, image };
     });
 
-    return { title: data.title, priceText: data.price, image: data.image };
+    if (!data.title || !data.price) {
+      throw new Error("Missing title or price");
+    }
+
+    return {
+      title: data.title,
+      priceText: data.price,
+      image: data.image
+    };
+
   } finally {
     await browser.close();
   }
@@ -210,6 +231,35 @@ app.delete("/api/watch/:asin/:watcherId", async (req, res) => {
     res.status(500).json({ error: err?.message || "Failed to delete watcher" });
   }
 });
+// Get all alerts with product info
+app.get("/api/user/alerts", async (req, res) => {
+  try {
+    const productsSnapshot = await db.collection("products").get();
+    const alerts = [];
+
+    for (const doc of productsSnapshot.docs) {
+      const asin = doc.id;
+      const product = doc.data();
+      const watchersSnap = await doc.ref.collection("watchers").get();
+
+      watchersSnap.forEach(w => {
+        alerts.push({
+          watcherId: w.id,
+          asin,
+          title: product.title,
+          image: product.image,
+          url: product.url,
+          target_price: w.data().target_price,
+        });
+      });
+    }
+
+    res.json(alerts);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to load alerts" });
+  }
+});
+
 
 // ---------------- Barcode route (OpenFoodFacts -> Amazon search) ----------------
 function makeKeywords(name) {
@@ -400,6 +450,10 @@ cron.schedule("0 0 * * *", () => {
 // Manual trigger (testing)
 app.get("/run-daily-now", async (req, res) => {
   runDailyUpdate().then(()=>res.json({ success: true })).catch(e=>res.status(500).json({ error: e?.message || e }));
+});
+// Serve Alerts Page
+app.get("/alerts", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "alerts.html"));
 });
 
 // ---------------- START ----------------

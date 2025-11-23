@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Price Alerts</title>
+  <link rel="stylesheet" href="Home.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">PRICE TRACKER</div>
+    <ul class="nav-links">
+      <li><a href="/homePage.html">Home</a></li>
+      <li><a href="/alerts.html" style="color:#6a0dad; font-weight:bold;">Alerts</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <h1>Your Price Alerts</h1>
+    <p class="tagline">Manage all your active alerts from here.</p>
+  </header>
+
+  <main style="max-width: 800px; margin: 30px auto;">
+    <div id="alerts-container" style="display:flex; flex-direction:column; gap:15px;"></div>
+    <p id="noAlerts" style="text-align:center; margin-top:20px; font-size: 18px; display:none;">No alerts added yet.</p>
+  </main>
+
+  <footer>
+    <p>© 2025 Price Tracker | All Rights Reserved</p>
+  </footer>
+
+  <script src="alerts.js"></script>
+</body>
+</html>
