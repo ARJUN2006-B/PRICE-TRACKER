@@ -8,6 +8,8 @@ if (!asin) {
   window.location.href = "Home.html";
 }
 
+window.PRODUCT_ASIN = asin;
+
 // DOM elements
 const titleEl = document.getElementById("product-title");
 const imgEl = document.getElementById("product-image");
