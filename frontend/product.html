@@ -58,6 +58,23 @@
         </tbody>
       </table>
     </section>
+
+    <!-- 🔔 PRICE DROP ALERT SECTION -->
+<section style="margin-top: 40px; padding: 18px; border: 1px solid #ddd; border-radius: 8px;">
+  <h3>Set Price Drop Alert</h3>
+
+  <label for="targetPrice">Target Price (₹):</label>
+  <input type="number" id="targetPrice" placeholder="Enter target price"
+         style="width: 100%; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+
+  <button onclick="setAlert()"
+          style="width: 100%; margin-top: 15px; padding: 12px; background: #6a0dad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+    Set Alert
+  </button>
+
+  <p id="alertMessage" style="margin-top: 12px; font-size: 14px;"></p>
+</section>
+
   </main>
 
   <footer>
@@ -73,5 +90,56 @@
 
   <!-- Product logic -->
   <script src="product.js"></script>
+  <script>
+// 🔹 ASIN comes from product.js (window.PRODUCT_ASIN)
+function setAlert() {
+  const asin = window.PRODUCT_ASIN;
+  const targetPrice = Number(document.getElementById("targetPrice").value);
+
+  // Optional: if you store email or FCM token in localStorage
+  const email = localStorage.getItem("user_email");  
+  const fcmToken = localStorage.getItem("fcmToken");
+
+  const messageEl = document.getElementById("alertMessage");
+
+  if (!asin) {
+    messageEl.innerHTML = "ASIN not loaded yet. Reload page.";
+    messageEl.style.color = "red";
+    return;
+  }
+
+  if (!targetPrice || targetPrice <= 0) {
+    messageEl.innerHTML = "Enter a valid target price.";
+    messageEl.style.color = "red";
+    return;
+  }
+
+  fetch("http://localhost:3000/api/watch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      asin,
+      email,
+      fcmToken,
+      target_price: targetPrice
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        messageEl.innerHTML = "🔔 Price alert set successfully!";
+        messageEl.style.color = "green";
+      } else {
+        messageEl.innerHTML = "Error setting alert.";
+        messageEl.style.color = "red";
+      }
+    })
+    .catch(err => {
+      console.error("Alert error:", err);
+      messageEl.innerHTML = "Server error. Try again.";
+      messageEl.style.color = "red";
+    });
+}
+</script>
 </body>
 </html>
