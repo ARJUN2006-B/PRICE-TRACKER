@@ -443,7 +443,7 @@ async function runDailyUpdate() {
   }
 }
 
-cron.schedule("0 0 * * *", () => {
+cron.schedule("0 9 * * *", () => {
   runDailyUpdate();
 }, { timezone: "Asia/Kolkata" });
 
@@ -454,6 +454,25 @@ app.get("/run-daily-now", async (req, res) => {
 // Serve Alerts Page
 app.get("/alerts", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "alerts.html"));
+});
+
+// ---------------- TEST EMAIL ROUTE ----------------
+app.get("/test-email", async (req, res) => {
+  try {
+    const testTo = SMTP_USER || process.env.SMTP_USER;
+    if (!testTo) return res.status(400).json({ success:false, error: "SMTP_USER not configured in .env" });
+
+    const subject = "✔ Price Tracker SMTP Test";
+    const text = "SMTP is working successfully!";
+    const html = `<h2>SMTP Test Successful</h2><p>Your Gmail SMTP is working correctly 🎉</p>`;
+
+    await transporter.sendMail({ from: NOTIFICATION_FROM, to: testTo, subject, text, html });
+    console.log("Test email sent to:", testTo);
+    res.json({ success: true, message: "Test email sent. Check your inbox." });
+  } catch (err) {
+    console.error("Test email error:", err?.message || err);
+    res.status(500).json({ success: false, error: err?.message || String(err) });
+  }
 });
 
 // ---------------- START ----------------
