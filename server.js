@@ -393,7 +393,7 @@ async function runDailyUpdate() {
   }
 }
 
-cron.schedule("37 15 * * *", () => {
+cron.schedule("0 0 * * *", () => {
   runDailyUpdate();
 }, { timezone: "Asia/Kolkata" });
 
