@@ -4,23 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QR Scanner | Price Tracker</title>
-  <link rel="stylesheet" href="scanner.css"/>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      padding: 20px; 
+      text-align: center; 
+    }
+    #barcode-reader { 
+      width: 100%; 
+      max-width: 500px; 
+      margin: 0 auto; 
+    }
+
+    /* Scanner box */
+    #scanner-view { 
+      display: block; 
+    }
+
+    /* Product Details Box */
+    #result-box { 
+      display: none; 
+    }
+
+    #product-info { 
+      margin: 20px auto; 
+      padding: 20px; 
+      border: 1px solid #ddd; 
+      border-radius: 8px; 
+      max-width: 900px;
+    }
+
+    #product-info img {
+      max-width: 250px;
+      height: auto;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
-  <header class="scanner-header">
-    <h1>Product QR Scanner</h1>
-  </header>
+  <h1>Scan Product Barcode</h1>
 
-  <main class="scanner-container">
-    <div class="scanner-box">
-      <div id="barcode-reader"></div>
-      <p class="scan-instruction">Align the QR code inside the frame to scan automatically</p>
+  <!-- Scanner View Area -->
+  <div id="scanner-view">
+    <div id="barcode-reader"></div>
+  </div>
+
+  <!-- Result Area -->
+  <div id="result-box">
+    <div id="product-info">
+      <h2 id="p-name"></h2>
+      <h3 id="p-brand"></h3>
+      <h3 id="p-price"></h3>
+      <img id="p-image" src="" alt="Product Image">
+      <p><a id="p-link" href="#" target="_blank">View Product</a></p>
     </div>
-  </main>
+  </div>
 
-
-
-  <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
-  <script src="scanner.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="scanner.js?v=999"></script>
 </body>
 </html>
