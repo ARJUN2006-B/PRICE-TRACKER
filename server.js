@@ -261,108 +261,71 @@ app.get("/api/user/alerts", async (req, res) => {
 });
 
 
-// ---------------- Barcode route (OpenFoodFacts -> Amazon search) ----------------
-function makeKeywords(name) {
-  if (!name) return [];
-  return name.toLowerCase().split(/[\s\-_,()]+/).filter(w => w.length > 2 && !["the","for","and","with","from","pack","size"].includes(w));
-}
+// ---------------- AMAZON BARCODE SEARCH (NO OPENFOODFACTS) ----------------
 
-app.get("/api/product/barcode/:barcodeNumber", async (req, res) => {
-  const { barcodeNumber } = req.params;
-  console.log("Scanning barcode:", barcodeNumber);
+app.get("/api/product/barcode/:code", async (req, res) => {
+  const code = req.params.code;
+  console.log("Scanning barcode:", code);
 
   try {
-    const offUrl = `https://world.openfoodfacts.org/api/v0/product/${barcodeNumber}.json`;
-    const offRes = await axios.get(offUrl).catch(()=>null);
-    const offData = offRes?.data;
+    // 1) Query UPCITEM DB
+    const upcUrl = `https://api.upcitemdb.com/prod/trial/lookup?upc=${code}`;
+    const upcRes = await axios.get(upcUrl);
+    const items = upcRes.data.items;
 
-    if (!offData || offData.status !== 1) {
-      return res.status(404).json({ error: "Product not found in OpenFoodFacts." });
+    if (!items || items.length === 0) {
+      return res.status(404).json({ error: "Barcode not found in UPC database." });
     }
 
-    const p = offData.product;
-    const productName = p.product_name || "";
-    const brand       = (p.brands || "").split(",")[0].trim() || "Unknown Brand";
-    const baseImage   = p.image_front_url || p.image_url || p.image_thumb_url || "";
+    const item = items[0];
+    const name = item.title || "";
+    const brand = item.brand || "Unknown Brand";
 
-    // Amazon best-match (search + cheerio)
-    let amazonPrice = "N/A";
-    let amazonUrl = "";
-    let amazonImage = "";
+    // 2) Search Amazon with product title
+    const searchQuery = encodeURIComponent(`${brand} ${name}`);
+    const amazonUrl = `https://www.amazon.in/s?k=${searchQuery}`;
 
-    const brandLower = brand.toLowerCase();
-    const nameKeywords = makeKeywords(productName);
-
-    if (productName) {
-      try {
-        const searchQuery = `${brand} ${productName}`.trim();
-        const searchUrl   = `https://www.amazon.in/s?k=${encodeURIComponent(searchQuery)}`;
-
-        const searchResp = await axios.get(searchUrl, {
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-            "Accept-Language": "en-IN,en;q=0.9"
-          },
-        });
-
-        const $ = cheerio.load(searchResp.data);
-        const results = $("div.s-result-item[data-component-type='s-search-result']");
-
-        let bestMatchEl = null, bestScore = -1, bestText = "";
-
-        results.each((i, el) => {
-          const title = $(el).find("h2 span").text().trim().toLowerCase();
-          if (!title) return;
-          if (brandLower && !title.includes(brandLower)) return;
-
-          let score = 0;
-          nameKeywords.forEach(k => { if (title.includes(k)) score += 2; });
-          if (score === 0 && brandLower && title.includes(brandLower)) score = 1;
-
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatchEl = el;
-            bestText = title;
-          }
-        });
-
-        if (bestMatchEl && bestScore >= 2) {
-          const el = cheerio.load(bestMatchEl);
-          const priceWhole = el(".a-price-whole").first().text().trim();
-          const priceFrac  = el(".a-price-fraction").first().text().trim();
-          if (priceWhole) amazonPrice = "₹" + priceWhole + (priceFrac ? "." + priceFrac : "");
-          let relative = el("a.a-link-normal.s-no-outline").attr("href") || el("h2 a").attr("href") || "";
-          if (relative) {
-            amazonUrl = relative.startsWith("http") ? relative : "https://www.amazon.in" + relative;
-            try {
-              const productHtml = (await axios.get(amazonUrl, { headers: { "User-Agent":"Mozilla/5.0", "Accept-Language":"en-IN,en;q=0.9" } })).data;
-              const $$ = cheerio.load(productHtml);
-              amazonImage = $$("#landingImage").attr("src") || $$("#imgTagWrapperId img").attr("src") || "";
-            } catch (err) {
-              console.log("Failed to fetch product page image:", err?.message || err);
-            }
-          }
-        } else {
-          console.log("No strong Amazon match (score:", bestScore, ")");
-        }
-      } catch (err) {
-        console.log("Amazon search error:", err?.message || err);
-      }
-    }
-
-    res.json({
-      product: {
-        name: productName || "Unknown",
-        brand,
-        price: amazonPrice,
-        image_url: amazonImage || baseImage,
-        url: amazonUrl || `https://www.amazon.in/s?k=${encodeURIComponent(`${brand} ${productName}`.trim())}`,
-        barcode: barcodeNumber
+    const searchRes = await axios.get(amazonUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "en-IN,en;q=0.9"
       }
     });
+
+    const $ = cheerio.load(searchRes.data);
+    const first = $("div.s-result-item[data-component-type='s-search-result']").first();
+
+    if (!first.html()) {
+      return res.status(404).json({ error: "Amazon has no matching product." });
+    }
+
+    // Extract price and image
+    const title = first.find("h2 span").text().trim();
+    const priceWhole = first.find(".a-price-whole").text().trim();
+    const priceFrac = first.find(".a-price-fraction").text().trim();
+    const price = priceWhole ? `₹${priceWhole}${priceFrac ? "." + priceFrac : ""}` : "N/A";
+
+    let relative = first.find("a.a-link-normal.s-no-outline").attr("href")
+      || first.find("h2 a").attr("href")
+      || "";
+
+    const url = relative.startsWith("http") ? relative : `https://www.amazon.in${relative}`;
+
+    let img = first.find("img").attr("src") || "";
+
+    return res.json({
+      product: {
+        name: title || name,
+        brand,
+        price,
+        image_url: img,
+        url
+      }
+    });
+
   } catch (err) {
-    console.error("Barcode error:", err?.message || err);
-    res.status(500).json({ error: "Failed to fetch product details." });
+    console.error("Barcode API Error:", err.message);
+    return res.status(500).json({ error: "Failed to match barcode." });
   }
 });
 

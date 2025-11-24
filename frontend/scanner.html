@@ -4,46 +4,135 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QR Scanner | Price Tracker</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body { 
-      font-family: sans-serif; 
-      padding: 20px; 
-      text-align: center; 
-    }
-    #barcode-reader { 
-      width: 100%; 
-      max-width: 500px; 
-      margin: 0 auto; 
+    :root {
+      --purple: #6a0dad;
+      --purple-dark: #4b048c;
+      --bg: #f7f3fc;
+      --card: #ffffff;
+      --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     }
 
-    /* Scanner box */
-    #scanner-view { 
-      display: block; 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
     }
 
-    /* Product Details Box */
-    #result-box { 
-      display: none; 
+    body {
+      background: var(--bg);
+      text-align: center;
+      padding-bottom: 40px;
     }
 
-    #product-info { 
-      margin: 20px auto; 
-      padding: 20px; 
-      border: 1px solid #ddd; 
-      border-radius: 8px; 
-      max-width: 900px;
+    /* HEADER */
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--purple-dark);
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+
+    /* Scanner Wrapper */
+    #scanner-view {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    /* Scanner Box */
+    #barcode-reader {
+      width: 350px;
+      height: 350px;
+      border-radius: 16px;
+      background: #ffffff;
+      padding: 10px;
+      border: 2px dashed var(--purple);
+      box-shadow: var(--shadow);
+    }
+
+    /* Product Card */
+    #result-box {
+      display: none;
+      margin-top: 25px;
+    }
+
+    #product-info {
+      background: var(--card);
+      padding: 25px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 650px;
+      margin: 0 auto;
+      box-shadow: var(--shadow);
+      border: none !important;
+    }
+
+    #product-info h2 {
+      font-size: 1.6rem;
+      color: var(--purple-dark);
+      margin-bottom: 8px;
+    }
+
+    #product-info h3 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #444;
     }
 
     #product-info img {
-      max-width: 250px;
-      height: auto;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 260px;
+      border-radius: 12px;
+      margin: 20px 0;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    #p-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 1rem;
+      color: var(--purple);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    #p-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Smooth Page Fade-in */
+    body {
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      #barcode-reader {
+        width: 260px;
+        height: 260px;
+      }
+      h1 {
+        font-size: 1.7rem;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <h1>Scan Product Barcode</h1>
 
   <!-- Scanner View Area -->
@@ -51,7 +140,7 @@
     <div id="barcode-reader"></div>
   </div>
 
-  <!-- Result Area -->
+  <!-- Product Details -->
   <div id="result-box">
     <div id="product-info">
       <h2 id="p-name"></h2>
