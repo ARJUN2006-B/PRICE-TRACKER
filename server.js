@@ -90,17 +90,29 @@ async function scrapeAmazon(url) {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
     );
 
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 45000 });
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 90000 });
 
     // IMPORTANT: wait for price to appear
     await page.waitForSelector(".a-price .a-offscreen", { timeout: 15000 });
 
     const data = await page.evaluate(() => {
-      const title = document.querySelector("#productTitle")?.innerText?.trim() || null;
+      const title =
+  document.querySelector("#productTitle")?.innerText?.trim() ||
+  document.querySelector("#title")?.innerText?.trim() ||
+  document.querySelector("span#productTitle")?.innerText?.trim() ||
+  null;
+
 
       const price =
-        document.querySelector(".a-price .a-offscreen")?.innerText?.trim() ||
-        null;
+  document.querySelector(".a-price .a-offscreen")?.innerText?.trim() ||  // normal price
+  document.querySelector("#corePrice_feature_div .a-offscreen")?.innerText?.trim() || // new layout
+  document.querySelector("#apex_offerDisplay_desktop .a-offscreen")?.innerText?.trim() || 
+  document.querySelector(".reinventPricePriceToPayMargin .a-offscreen")?.innerText?.trim() ||
+  document.querySelector(".a-size-medium.a-color-price")?.innerText?.trim() || 
+  document.querySelector("#priceblock_ourprice")?.innerText?.trim() || 
+  document.querySelector("#priceblock_dealprice")?.innerText?.trim() ||
+  null;
+
 
       const image =
         document.querySelector("#landingImage")?.src ||
