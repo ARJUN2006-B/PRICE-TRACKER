@@ -15,6 +15,12 @@ body {
   align-items: center;
   min-height: 100vh;
 }
+.main-logo {
+    width: 40%;          /* adjust size (40%, 35%, 30%…) */
+    max-width: 500px;    /* prevents the image from getting too big */
+    display: block;      /* required to center with margin auto */
+    margin: 0 auto;      /* centers the image */
+}
 
 /* ===== Navbar ===== */
 .navbar {
@@ -68,6 +74,7 @@ header h1 {
 
 header .tagline {
   margin-top: 10px;
+  padding-bottom: 50px;
   font-size: 1.1rem;
   color: #555;
 }
