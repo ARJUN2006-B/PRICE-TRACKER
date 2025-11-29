@@ -92,8 +92,58 @@
 
 <script>
 
+// async function validateUrl() {
+//   const input = document.getElementById("productUrl");
+//   if (!input) {
+//     alert("Product URL input not found");
+//     return;
+//   }
+
+//   const url = input.value.trim();
+//   if (!url) {
+//     alert("Please enter a product URL");
+//     return;
+//   }
+
+//   if (!url.includes("amazon.")) {
+//     alert("Only Amazon product URLs are supported right now.");
+//     return;
+//   }
+
+//   const asin = extractASIN(url);
+//   if (!asin) {
+//     alert("Couldn't extract ASIN from this URL.");
+//     return;
+//   }
+
+//   try {
+//     // call your backend to scrape + save
+//     const res = await fetch("http://localhost:3000/api/fetch", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ url }),
+//     });
+
+//     const data = await res.json();
+//     console.log("Backend response:", data);
+
+//     if (!res.ok || data.error) {
+//       alert("Server error: " + (data.error || "Unknown error"));
+//       return;
+//     }
+
+//     // redirect to product page with asin
+//     window.location.href = `product.html?asin=${asin}`;
+//   } catch (err) {
+//     console.error(err);
+//     alert("Failed to reach backend. Is server running on http://localhost:3000 ?");
+//   }
+// }
+
 async function validateUrl() {
   const input = document.getElementById("productUrl");
+  const loader = document.getElementById("loader");
+
   if (!input) {
     alert("Product URL input not found");
     return;
@@ -106,18 +156,20 @@ async function validateUrl() {
   }
 
   if (!url.includes("amazon.")) {
-    alert("Only Amazon product URLs are supported right now.");
+    alert("Only Amazon product URLs are supported.");
     return;
   }
 
   const asin = extractASIN(url);
   if (!asin) {
-    alert("Couldn't extract ASIN from this URL.");
+    alert("Couldn't extract ASIN from the URL.");
     return;
   }
 
+  // 👉 Show Loader
+  loader.style.display = "flex";
+
   try {
-    // call your backend to scrape + save
     const res = await fetch("http://localhost:3000/api/fetch", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -129,14 +181,17 @@ async function validateUrl() {
 
     if (!res.ok || data.error) {
       alert("Server error: " + (data.error || "Unknown error"));
+      loader.style.display = "none"; // Hide loader if error
       return;
     }
 
-    // redirect to product page with asin
+    // 👉 Redirect to product page
     window.location.href = `product.html?asin=${asin}`;
+
   } catch (err) {
     console.error(err);
-    alert("Failed to reach backend. Is server running on http://localhost:3000 ?");
+    alert("Failed to reach backend. Is server running?");
+    loader.style.display = "none"; // Hide loader if failure
   }
 }
 
@@ -156,8 +211,21 @@ function extractASIN(url) {
 
 </script>
 
+<script>
+window.addEventListener("load", () => {
+  document.getElementById("loader").style.display = "none";
+});
+</script>
+
+
 <script type="module" src="./firebase/config.js"></script>
 <script type="module" src="./Login.js"></script>
+
+<!-- Loader Overlay -->
+<div id="loader" class="loader-overlay">
+    <div class="spinner"></div>
+    <p class="loader-text">Loading...</p>
+</div>
 
 </body>
 </html>
